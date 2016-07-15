@@ -1,7 +1,7 @@
 gr = love.graphics
 ev = love.event
 ms = love.mouse
-
+wn = love.window
 
 function deepcopy(orig)
    local orig_type = type(orig)
