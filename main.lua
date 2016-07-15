@@ -8,11 +8,14 @@ B_2 = BLOCK_SIZE / 2
 CIRCLE_SEGMENTS = 10
 
 ZOOM_SENSITIVITY = 0.05
-ZOOM_POWER = 10
-ZOOM_MAX = 2.0
-ZOOM_MIN = 0.5
+ZOOM_POWER = 2
+ZOOM_MAX = 3.0
+ZOOM_MIN = 1.0
 
 function love.load()
+
+   wn.setMode( 500, 500, {} )
+   --ms.setVisible(false)
 
    -- images
    grass1 = gr.newImage('assets/img/ground/grass1.png')
@@ -47,6 +50,8 @@ end
 function love.update(dt)
    update_map(dt)
    update_units(dt)
+
+   Viewport.update(dt)
 end
 
 function update_units(dt)
@@ -78,24 +83,12 @@ end
 function draw_map()
    gr.push()
 
-   -- map zooming
-   -- local mousepos = { ms.getPosition() }
-   -- mousepos[1] = mousepos[1] / gr.getWidth() -- 0 -> 1
-   -- mousepos[2] = mousepos[2] / gr.getHeight() -- 0 -> 1
+   -- zoom
+   gr.scale(unpack( map( function(p) return 1 / math.pow(p, ZOOM_POWER) end, copy(Viewport.zoom))))
 
-   -- local offset_x = mousepos[1] * BLOCK_SIZE * #game_map[1]
-   -- local offset_y = mousepos[2] * BLOCK_SIZE * #game_map
-   -- local offset = { offset_x, offset_y }
-
-   -- gr.translate(unpack( copy(offset) ))
-   gr.scale(unpack( map( function(p) return math.pow(p, ZOOM_POWER) end, {0.82, 0.82}))) -- TODO: scale at mousepos
-
-   -- gr.scale(unpack( map( function(p) return 1 / math.pow(p, ZOOM_POWER) end, copy(map_zoom))))
-
-   -- gr.translate(unpack( map( function(p) return (p * -1) end, copy(offset))))
-
-   -- -- map panning
-   -- gr.translate(unpack( copy(map_pan) ))
+   -- pan
+   local pos = { Viewport.getX(), Viewport.getY() }
+   gr.translate(unpack( map( function(p) return (p * -1) end, pos)))
 
    -- draw tiles
    gr.setColor(255, 255, 255)
@@ -120,7 +113,7 @@ function draw_debug()
    gr.setColor(222, 0, 0)
    for y=1, #game_map do
       for x=1, #game_map[y] do
-         gr.rectangle("line", (x - 1) * BLOCK_SIZE, (y - 1) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
+         --gr.rectangle("line", (x - 1) * BLOCK_SIZE, (y - 1) * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
          if game_map[y][x] == 0 then
             --gr.rectangle("line", x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE)
          end
@@ -137,6 +130,17 @@ function draw_debug()
    -- draw viewport bounds
    gr.setColor(0, 255, 255)
    gr.rectangle("line", Viewport.getX(), Viewport.getY(), Viewport.getW(), Viewport.getH())
+
+   local mousepos = { ms.getPosition() }
+   mousepos[1] = mousepos[1] / gr.getWidth() -- 0 -> 1
+   mousepos[2] = mousepos[2] / gr.getHeight() -- 0 -> 1
+
+   -- draw 'target' of viewport
+   gr.setColor(255, 255, 255)
+   gr.circle("line", Viewport.getX() + Viewport.getW() * mousepos[1], Viewport.getY() + Viewport.getH() * mousepos[2], 10, CIRCLE_SEGMENTS)
+
+   print('zoom', Viewport.zoom[1], Viewport.zoom[2] )
+   print('dim', Viewport.dim[1], Viewport.dim[2] )
 
 end
 
