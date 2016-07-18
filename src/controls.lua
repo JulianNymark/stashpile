@@ -2,7 +2,17 @@ Mouse = {
    delta = {0, 0},
    pan_active = false,
    -- startPos = {0, 0},
+   world_coord = {0, 0}
 }
+
+function Mouse.update(dt)
+   local mousepos = { ms.getPosition() }
+   mousepos[1] = mousepos[1] / gr.getWidth() -- 0 -> 1
+   mousepos[2] = mousepos[2] / gr.getHeight() -- 0 -> 1
+
+   Mouse.world_coord = { Viewport.getX() + Viewport.getW() * mousepos[1],
+                   Viewport.getY() + Viewport.getH() * mousepos[2] }
+end
 
 function love.keypressed(key)
    if key == 'escape' then
