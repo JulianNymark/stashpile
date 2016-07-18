@@ -23,33 +23,13 @@ function love.load()
    -- insert an NPC test unit (player = 0 )
    units = {}
    table.insert(units, Unit:new())
+   u1 = units[1]
 
    -----------------------
    -- AI
    -----------------------
-   -- give test unit some timer event AI logic
-   u1 = units[1]
-   local function decide_on_random_destination( unit )
-      -- set destination
-      local rand_x = 2 - math.random(3)
-      local rand_y = 2 - math.random(3)
-      local want_move_x = unit.grid_x + rand_x
-      local want_move_y = unit.grid_y + rand_y
-
-      if game_map[want_move_y][want_move_x] == 0 then
-         unit.grid_x = want_move_x
-         unit.grid_y = want_move_y
-      end
-   end
-
-   local timerevent = {
-      every=0.2, -- when to fire
-      count=0, -- how often it should trigger
-      uptime=0, -- accumulate time (don't set to other than 0 :p )
-      triggered=0, -- how many times has it currently been triggered ( don't change :p )
-      fun=decide_on_random_destination, -- what to do
-   }
-   table.insert(u1.timers, timerevent)
+   --unit_set_timer_event(units[1])
+   unit_set_new_destination(units[1])
 
    -- dynamic game variables
    pan = {0, 0}
@@ -84,4 +64,66 @@ function is_point_inside_rect( point, rect )
       return false
    end
    return true
+end
+
+function unit_set_new_destination( unit )
+
+   local function unit_has_reached_destination( unit )
+      if unit.act_x - ( unit.grid_x - 1 ) * BLOCK_SIZE <= BLOCK_SIZE/50 and
+         unit.act_y - ( unit.grid_y - 1 ) * BLOCK_SIZE <= BLOCK_SIZE/50
+      then
+         return true
+      end
+      return false
+   end
+
+   local function unit_reached_destination( unit )
+      print('unit reached destination!')
+      -- unit will set new destination asap on reaching dest
+
+      -- set new destination
+      local rand_x = 2 - math.random(3)
+      local rand_y = 2 - math.random(3)
+      local want_move_x = unit.grid_x + rand_x
+      local want_move_y = unit.grid_y + rand_y
+
+      if game_map[want_move_y][want_move_x] == 0 then
+         unit.grid_x = want_move_x
+         unit.grid_y = want_move_y
+      end
+
+      -- register a new eventlistener (for this very same event!)
+      unit_set_new_destination(unit)
+   end
+
+   local event = {
+      cond=unit_has_reached_destination, -- what condition
+      fun=unit_reached_destination, -- what to do
+   }
+   table.insert(unit.events, event)
+end
+
+function unit_set_timer_event( unit )
+   -- give test unit some timer event AI logic
+   local function decide_on_random_destination( unit )
+      -- set destination
+      local rand_x = 2 - math.random(3)
+      local rand_y = 2 - math.random(3)
+      local want_move_x = unit.grid_x + rand_x
+      local want_move_y = unit.grid_y + rand_y
+
+      if game_map[want_move_y][want_move_x] == 0 then
+         unit.grid_x = want_move_x
+         unit.grid_y = want_move_y
+      end
+   end
+
+   local timerevent = {
+      every=5, -- when to fire
+      count=0, -- how often it should trigger
+      uptime=0, -- accumulate time (don't set to other than 0 :p )
+      triggered=0, -- how many times has it currently been triggered ( don't change :p )
+      fun=decide_on_random_destination, -- what to do
+   }
+   table.insert(unit.timers, timerevent)
 end

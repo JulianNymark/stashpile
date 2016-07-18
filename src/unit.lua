@@ -2,10 +2,11 @@ Unit = {
    player = 0, -- 0 = npc, 1 = player 1, ...
    grid_x = 10,
    grid_y = 10,
-   speed = 10,
+   speed = 2,
    size = 0.5,
    uptime = 0,
    timers = {},
+   events = {},
 }
 
 function Unit:new (obj)
@@ -36,13 +37,25 @@ end
 function Unit:update (dt)
    self.uptime = self.uptime + dt
 
-   -- update timers (events)
+   -- update timer events
    for t=1, #self.timers do
       local the_t = self.timers[t]
       the_t.uptime = the_t.uptime + dt
       if the_t.uptime >= the_t.every * the_t.triggered then
          the_t.triggered = the_t.triggered + 1
          the_t.fun( self )
+         if the_t.count > 0 and the_t.triggered >= the_t.count then
+            table.remove(self.timers, t)
+         end
+      end
+   end
+
+   -- update condition events
+   for e=1, #self.events do
+      local the_e = self.events[e]
+      if the_e.cond( self ) then
+         the_e.fun( self )
+         table.remove(self.events, e)
       end
    end
 
