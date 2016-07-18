@@ -13,11 +13,11 @@ function Viewport.getY()
 end
 
 function Viewport.getW()
-   return Viewport.dim[1] * math.pow(Viewport.zoom[1], ZOOM_POWER)
+   return Viewport.dim[1] * Viewport.zoom[1]
 end
 
 function Viewport.getH()
-   return Viewport.dim[2] * math.pow(Viewport.zoom[2], ZOOM_POWER)
+   return Viewport.dim[2] * Viewport.zoom[2]
 end
 
 function Viewport.update(dt)

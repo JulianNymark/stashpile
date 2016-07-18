@@ -59,10 +59,8 @@ function love.wheelmoved(x, y)
    mp_center_offset[1] = (mp_center_offset[1] - 0.5) * 2
    mp_center_offset[2] = (mp_center_offset[2] - 0.5) * 2
 
-   local offset_amount = map( function(p) return math.pow(p*2, ZOOM_POWER) end, copy(Viewport.zoom)) -- TODO: fix
-
-   Viewport.pos[1] = Viewport.pos[1] + (offset_amount[1] * mp_center_offset[1] * y)
-   Viewport.pos[2] = Viewport.pos[2] + (offset_amount[2] * mp_center_offset[2] * y)
+   Viewport.pos[1] = Viewport.pos[1] + ((1 / ZOOM_SENSITIVITY) * mp_center_offset[1] * y)
+   Viewport.pos[2] = Viewport.pos[2] + ((1 / ZOOM_SENSITIVITY) * mp_center_offset[2] * y)
 
    -- actual zooming (scaling)
    Viewport.zoom[1] = Viewport.zoom[1] - y * ZOOM_SENSITIVITY
