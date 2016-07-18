@@ -14,8 +14,8 @@ function Unit:new (obj)
    self.__index = self
 
    -- initial actual location
-   self.act_x = self.grid_x * BLOCK_SIZE
-   self.act_y = self.grid_y * BLOCK_SIZE
+   self.act_x = (self.grid_x - 1) * BLOCK_SIZE
+   self.act_y = (self.grid_y - 1) * BLOCK_SIZE
 
    return obj
 end
@@ -47,6 +47,6 @@ function Unit:update (dt)
    end
 
    -- move
-   self.act_y = self.act_y - ((self.act_y - self.grid_y * BLOCK_SIZE) * self.speed * dt)
-   self.act_x = self.act_x - ((self.act_x - self.grid_x * BLOCK_SIZE) * self.speed * dt)
+   self.act_y = self.act_y - ((self.act_y - ( self.grid_y - 1 ) * BLOCK_SIZE) * self.speed * dt)
+   self.act_x = self.act_x - ((self.act_x - ( self.grid_x - 1 ) * BLOCK_SIZE) * self.speed * dt)
 end
